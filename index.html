@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    
+</head>
+<style>
+  .comment  {
+        border: 2px solid black;
+    border-radius: 15px;
+    margin-top: 1rem;
+    padding: 1rem;
+    }
+</style>
+<body>
+    
+    <h1>My weather app Server</h1>
+
+     
+        
+    <form onsubmit="getWeather(); return false">
+    
+    
+        <label for="cityName">City Name:</label>
+
+        <input type="text" name="cityName" id="cityName" placeholder="enter your city name" ><br>
+    <br>
+    <button type="submit"     >Get Weather</button><br>
+    
+    </form>
+
+    <div id="result" ></div>
+
+    <div id="comments"> 
+<h1>Comments</h1>
+
+
+   <form id="postCommentForm">
+    
+    
+    <input type="text" id="nameInput" placeholder="enter Your Name" ><br>
+
+    <input type="text" id="commentInput" placeholder="enter Your Comment" ><br>
+<button type="submit" >Post</button><br>
+
+</form>
+
+<div id="previousComments">
+    
+    </div>
+     
+</div>
+
+ 
+
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <script  type="module">
+        
+        let name="john";
+        
+        window.getWeather= function(){
+            
+            let cityName = document.querySelector("#cityName").value;
+//             http://localhost:3004/weather/${cityName}
+    axios.get(`/weather/${cityName}`)
+      .then(function (response) {
+        console.log(response.data);
+//         {
+// city:"KArachi",
+// tempInCel:41,
+// humidity:43,
+// high:50,
+// low:11
+
+//     }
+    document.querySelector("#result").innerHTML=`The weather is ${response.data.tempInCel}°C   `
+    
+      })
+      .catch(function (error) {
+    
+        console.log(error.data);
+    document.querySelector("#result").innerHTML="Error in getting weather";
+    
+    })
+    
+    }
+    
+
+       document
+       .querySelector("#postCommentForm")
+       .addEventListener("submit",async(event)=>{
+        event.preventDefault();
+        let nameInput = document.querySelector("#nameInput").value;
+        let commentInput = document.querySelector("#commentInput").value;
+            
+
+//             http://localhost:3004/weather/${cityName}
+
+try {
+
+
+    const axiosResponse = await axios.post(`/comment/${nameInput}`,{
+        comment:commentInput 
+    })
+// {
+// message:"message sent successfully"
+// }
+
+
+    console.log(axiosResponse)    
+ 
+    document.querySelector("#previousComments").innerHTML=
+    ` 
+    <div class="comment">
+        <h3 class="commentName">${nameInput}</h3>
+        <p ="commentText">${commentInput}</p>
+    </div>  
+     `
+    
+
+    
+} catch (error) {
+    
+    console.log(error.data);
+    document.querySelector("#result").innerHTML="Error in getting weather";
+    
+    
+}
+
+       
+    
+    });
+    
+    
+    const getAllComments =async ()=>{
+        const axiosResponse=await axios.get("/comments");
+
+console.log(axiosResponse.data );//[]    
+     
+axiosResponse.data.map((eachComment)=>{
+    document.querySelector("#previousComments").innerHTML+=
+
+    ` 
+    <div class="comment">
+        <h3 id="commentName">${eachComment.name}</h3>
+        <p id="commentText">${eachComment.comment}</p>
+    </div>  
+     `
+    
+})
+    
+
+    }
+    setTimeout(()=>{
+        getAllComments();
+    },100)
+    
+    </script>
+    
+    
+    </body>
+    </html>
+
+<!-- 
+</body>
+</html> -->
+
+
